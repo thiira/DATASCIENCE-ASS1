@@ -1,0 +1,40 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from joblib import dump# Load the dataset
+url = "https://archive.ics.uci.edu/ml/machine-learning-databases/00331/Accident.csv"
+df = pd.read_csv(url)
+
+# Preprocessing the data
+df = df.drop(columns=['AccNo', 'AccidentSeverityDescription', 'VehReg', 'VehMake', 'VehModel', 'VehColor'])
+df['Rural'] = df['Rural'].astype(int)
+df['Urban'] = df['Urban'].astype(int)
+df['MVAug'] = df['MVAug'].astype(int)
+df['MVDefect'] = df['MVDefect'].astype(int)
+df['MVOther'] = df['MVOther'].astype(int)
+df['RoadCond'] = df['RoadCond'].astype(int)
+df['Weather'] = df['Weather'].astype(int)
+df['Light'] = df['Light'].astype(int)
+df['Time'] = df['Time'].astype(int)
+
+# Split the data into dependent and independent variables
+X = df.drop(columns='Severity')
+y = df['Severity']
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Create the linear regression model
+model = LinearRegression()
+
+# Train the model
+model.fit(X_train, y_train)
+
+# Save the model
+dump(model, 'accident_severity_model.joblib')
+
+# Example of using the model to predict accident severity for a hypothetical set of independent variables
+new_data = np.array([[1, 0, 0, 0, 0, 0, 0, 1, 12]]).T
+severity_prediction = model.predict(new_data)
+print("Predicted Severity:", severity_prediction[0])
